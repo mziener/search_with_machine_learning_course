@@ -294,7 +294,7 @@ class DataPrepper:
                     # Do nothing for now
             else:
                 print("No aggregations found in %s" % response)
-        return (ranks_features_df,
+        return (ranks_features_df, 
                 aggs)  # return out the aggregations, bc we are going to need it to write the model normalizers
 
     # Determine the number of clicks for this sku given a query (represented by the click group)

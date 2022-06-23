@@ -158,7 +158,9 @@
                 }
               }
             ]
-      }}},
+          }
+        }
+      },
       {
         "name": "factorSalesRank",
         "template_language": "mustache",
@@ -178,8 +180,6 @@
           }
         }
       }
-
-     
     ]
   }
 }
