@@ -25,8 +25,8 @@ def plots(xgb_model, xgb_model_name, xgb_feat_map, xgb_plot):
 
 
 # xgb_train_data is a string path to our training file
-def train(xgb_train_data, num_rounds=5, xgb_conf=None ):
-    xgb_params = {'objective': 'reg:logistic'}
+def train(xgb_train_data, num_rounds=10, xgb_conf=None ):
+    xgb_params = {'objective': 'reg:pairwise'}
     bst = None
     if xgb_conf is not None:
         with open(xgb_conf) as json_file:
