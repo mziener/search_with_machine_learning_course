@@ -49,12 +49,13 @@ def create_prior_queries(doc_ids, doc_id_weights,
 
 
 # Hardcoded query here.  Better to use search templates or other query config.
-def create_query(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, source=None):
+def create_query(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, source=None, args=None):
+    search_field = 'name.synonyms' if args.synonym else 'name'
     query_obj = {
         'size': size,
-        "sort": [
-            {sort: {"order": sortDir}}
-        ],
+        #"sort": [
+        #    {sort: {"order": sortDir}}
+        #], #HACK: 'No mapping found for [null] in order to sort on')
         "query": {
             "function_score": {
                 "query": {
@@ -65,7 +66,7 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
                         "should": [  #
                             {
                                 "match": {
-                                    "name": {
+                                    search_field: {
                                         "query": user_query,
                                         "fuzziness": "1",
                                         "prefix_length": 2,
@@ -186,11 +187,8 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
     return query_obj
 
 
-def search(client, user_query, index="bbuy_products", sort="_score", sortDir="desc"):
-    #### W3: classify the query
-    #### W3: create filters and boosts
-    # Note: you may also want to modify the `create_query` method above
-    query_obj = create_query(user_query, click_prior_query=None, filters=None, sort=sort, sortDir=sortDir, source=["name", "shortDescription"])
+def search(client, user_query, index="bbuy_products", sort=None, sortDir="desc", args=None):
+    query_obj = create_query(user_query, click_prior_query=None, filters=None, sort=sort, sortDir=sortDir, source=["name", "shortDescription"], args=args)
     logging.info(query_obj)
     response = client.search(query_obj, index=index)
     if response and response['hits']['hits'] and len(response['hits']['hits']) > 0:
@@ -199,6 +197,8 @@ def search(client, user_query, index="bbuy_products", sort="_score", sortDir="de
 
 
 if __name__ == "__main__":
+    import sys
+    print(sys.argv)
     host = 'localhost'
     port = 9200
     auth = ('admin', 'admin')  # For testing only. Don't store credentials in code.
@@ -212,8 +212,9 @@ if __name__ == "__main__":
                          help='The OpenSearch port')
     general.add_argument('--user',
                          help='The OpenSearch admin.  If this is set, the program will prompt for password too. If not set, use default of admin/admin')
-
+    general.add_argument("--synonym", action="store_true", help="Search in synonyms")
     args = parser.parse_args()
+    print(args)
 
     if len(vars(args)) == 0:
         parser.print_usage()
@@ -241,11 +242,12 @@ if __name__ == "__main__":
     index_name = args.index
     query_prompt = "\nEnter your query (type 'Exit' to exit or hit ctrl-c):"
     print(query_prompt)
-    for line in fileinput.input():
+    for line in fileinput.input(['-']):
         query = line.rstrip()
         if query == "Exit":
             break
-        search(client=opensearch, user_query=query, index=index_name)
+        #### W3: classify the query
+        search(client=opensearch, user_query=query, index=index_name, args=args)
 
         print(query_prompt)
 
