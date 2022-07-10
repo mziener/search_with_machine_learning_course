@@ -11,6 +11,11 @@ from urllib.parse import urljoin
 import pandas as pd
 import fileinput
 import logging
+from fasttext import FastText
+import nltk
+
+import nltk
+stemmer = nltk.stem.PorterStemmer()
 
 
 logger = logging.getLogger(__name__)
@@ -49,12 +54,12 @@ def create_prior_queries(doc_ids, doc_id_weights,
 
 
 # Hardcoded query here.  Better to use search templates or other query config.
-def create_query(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, source=None, args=None):
+def create_query(user_query, click_prior_query, filters, sort="_score", sortDir="desc", size=10, source=None, args=None, shoulds=None):
     search_field = 'name.synonyms' if args.synonym else 'name'
     query_obj = {
         'size': size,
         #"sort": [
-        #    {sort: {"order": sortDir}}
+        #   {sort: {"order": sortDir}}],
         #], #HACK: 'No mapping found for [null] in order to sort on')
         "query": {
             "function_score": {
@@ -184,16 +189,31 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
             print("Couldn't replace query for *")
     if source is not None:  # otherwise use the default and retrieve all source
         query_obj["_source"] = source
+    if shoulds:
+        for should in shoulds:
+            query_obj['query']['function_score']['query']['bool']['should'].append(should)
     return query_obj
 
 
 def search(client, user_query, index="bbuy_products", sort=None, sortDir="desc", args=None):
-    query_obj = create_query(user_query, click_prior_query=None, filters=None, sort=sort, sortDir=sortDir, source=["name", "shortDescription"], args=args)
+    processed_query = stemmer.stem(user_query.lower())
+    print(processed_query)
+    ml_cat = ft.predict(processed_query)
+    print(ml_cat[0])
+    ml_prop = ml_cat[0][0][9:]
+    filters = [{"term": {"categoryPathIds": ml_cat[0][0][9:]}}] if len(ml_cat[0]) == 1 else None
+    shoulds = None
+    if len(ml_cat[0])> 1:
+        cats = sorted(zip(ml_cat[0], ml_cat[1]), key=lambda x: x[1])
+        shoulds = [{"term": {"categoryPathIds": cat[0][9:]}} for cat in cats if cat[1]>0.5]
+    #filters=None
+    query_obj = create_query(user_query, click_prior_query=None, filters=filters, shoulds=shoulds,sort=sort, sortDir=sortDir, source=["name", "shortDescription"], args=args)
     logging.info(query_obj)
     response = client.search(query_obj, index=index)
     if response and response['hits']['hits'] and len(response['hits']['hits']) > 0:
         hits = response['hits']['hits']
         print(json.dumps(response, indent=2))
+        print(ml_cat)
 
 
 if __name__ == "__main__":
@@ -242,6 +262,7 @@ if __name__ == "__main__":
     index_name = args.index
     query_prompt = "\nEnter your query (type 'Exit' to exit or hit ctrl-c):"
     print(query_prompt)
+    ft = FastText.load_model('/workspace/datasets/labeled_model.bin')
     for line in fileinput.input(['-']):
         query = line.rstrip()
         if query == "Exit":

@@ -3,6 +3,7 @@ import argparse
 import xml.etree.ElementTree as ET
 import pandas as pd
 import numpy as np
+import pdb
 import csv
 
 # Useful if you want to perform stemming.
@@ -42,15 +43,45 @@ for child in root:
     if leaf_id != root_category_id:
         categories.append(leaf_id)
         parents.append(cat_path_ids[-2])
-parents_df = pd.DataFrame(list(zip(categories, parents)), columns =['category', 'parent'])
 
+# Setting up lookup structures
+
+links = {cat:{"parent": parent} for parent, cat in zip(parents,categories)}
+links['cat00000']={"parent": None}
+print(f"Setup lookup with {len(parents)} parents and {len(categories)} categories")
 # Read the training data into pandas, only keeping queries with non-root categories in our category tree.
 df = pd.read_csv(queries_file_name)[['category', 'query']]
 df = df[df['category'].isin(categories)]
-
-# IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
+for cat, count in df.groupby('category').agg(num_queries=('query', 'count')).itertuples():
+    links[cat]['count'] = count
+print("Read training data")
 
 # IMPLEMENT ME: Roll up categories to ancestors to satisfy the minimum number of queries per category.
+
+while True:
+    quit = True
+    for cat,data in list(links.items()):
+        if 'count' in data and data['count']<=min_queries:
+            parent = data['parent']
+            links[parent]['count'] = links[parent].get('count',0) + data['count']
+            del links[cat]['count']
+            quit = False
+    if quit:
+        break
+print("Rolling up done")
+# IMPLEMENT ME: Convert queries to lowercase, and optionally implement other normalization, like stemming.
+df['query'] = df['query'].map(lambda query: stemmer.stem(query.lower()))
+print("Stemming done")
+
+def find_replacement(category):
+    while True:
+        if 'count' in links[category]:
+            return category
+        else:
+            category = links[category]['parent']
+replacements = {cat:find_replacement(cat) for cat in df['category'].unique()}
+df['category'].replace(replacements, inplace=True)
+print(f"Applied {len(replacements)} replacements resulting in {len(df['category'].unique())} categories")
 
 # Create labels in fastText format.
 df['label'] = '__label__' + df['category']

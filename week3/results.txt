@@ -1,0 +1,505 @@
+For query classification:
+
+How many unique categories did you see in your rolled up training data when you set the minimum number of queries per category to 1000? To 10000?
+
+With the threshold of 1000 I get 389 categories with the threshold of 10000 I get 73 categories.
+
+What were the best values you achieved for R@1, R@3, and R@5? You should have tried at least a few different models, varying the minimum number of queries per category, as well as trying different fastText parameters or query normalization. Report at least 2 of your runs.
+
+With the vanilla (standard parameters without tuning) model on 389 categories I get the following values for R@1, R@3 and R@5: 0.481, 0.633, 0.697.
+With 25 epochs and -wordNgrams 2 on 398 Categories I get the following values: R@1 0.527, R@3 0.714, R@5 0.776 with a large increase in training time.
+-wordNgrams 3 produced similar results with a lower training time.
+
+For integrating query classification with search:
+
+Give 2 or 3 examples of queries where you saw a dramatic positive change in the results because of filtering. Make sure to include the classifier output for those queries.
+
+iphone
+{
+  "took": 11,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 63,
+      "relation": "eq"
+    },
+    "max_score": 519.30914,
+    "hits": [
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3815157",
+        "_score": 519.30914,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone 4 with 8GB Memory - White (AT&T)"
+          ],
+          "shortDescription": [
+            "Up to 7 hours talk time3.5\" Retina color display5.0-megapixel digital camera with rear-facing camera\n\nRequires a data plan starting at $20\n\nEarly termination fees will be prorated, starting at $325 minus $10 for each full month of service commitment completed"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3815272",
+        "_score": 459.5101,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone 4 with 8GB Memory - White (Verizon Wireless)"
+          ],
+          "shortDescription": [
+            "Up to 7 hours talk time3.5\" Retina color display5.0-megapixel digital camera with rear-facing cameraWi-Fi video calling-capable  \nRequires a voice plan and a data package\n\nEarly termination fee of $350."
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3815041",
+        "_score": 433.74213,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone 4 with 8GB Memory - Black (AT&T)"
+          ],
+          "shortDescription": [
+            "Up to 7 hours talk time3.5\" Retina color display5.0-megapixel digital camera with rear-facing cameraWi-Fi video calling-capable \n\nRequires a data plan starting at $20\n\nEarly termination fees will be prorated, starting at $325 minus $10 for each full month of service commitment completed"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3825057",
+        "_score": 425.9335,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone 4 with 8GB Memory - White (Sprint)"
+          ],
+          "shortDescription": [
+            "Up to 7 hours talk time3.5\" Retina color display5.0-megapixel digital camera with rear-facing cameraWi-Fi video calling-capable"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3815245",
+        "_score": 421.3683,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone 4 with 8GB Memory - Black (Verizon Wireless)"
+          ],
+          "shortDescription": [
+            "Up to 7 hours talk time3.5\" Retina color display5.0-megapixel digital camera with rear-facing cameraWi-Fi video calling-capable \nRequires a voice plan and a data package\n\nEarly termination fee of $350."
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3487648",
+        "_score": 398.6299,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone\u00ae 4S with 16GB Memory Mobile Phone - White (AT&T)"
+          ],
+          "shortDescription": [
+            "iOS 5 operating systemSiri voice assistanceiCloud content storageiSight 8.0MP camera with 1080p HD videoDual-core A5 chip \nRequires a data plan starting at $20.\n\nEarly termination fees will be prorated, starting at $325 minus $10 for each full month of service commitment completed."
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3487784",
+        "_score": 361.77182,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone\u00ae 4S with 16GB Memory Mobile Phone - Black (AT&T)"
+          ],
+          "shortDescription": [
+            "iOS 5 operating systemSiri voice assistanceiCloud content storageiSight 8.0MP camera with 1080p HD videoDual-core A5 chip \nRequires a data plan starting at $20.\n\nEarly termination fees will be prorated, starting at $325 minus $10 for each full month of service commitment completed."
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3562527",
+        "_score": 304.3384,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone\u00ae 4S with 16GB Memory Mobile Phone - White (Verizon Wireless)"
+          ],
+          "shortDescription": [
+            "iOS 5 operating systemSiri voice assistanceiCloud content storageiSight 8.0MP camera with 1080p HD videoDual-core A5 chip\nRequires a voice plan and a data package\n\nEarly termination fee of $350."
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3825048",
+        "_score": 295.42505,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone\u00ae 4 with 8GB Memory - Black (Sprint)"
+          ],
+          "shortDescription": [
+            "Up to 7 hours talk time3.5\" Retina color display5.0-megapixel digital camera with rear-facing cameraWi-Fi video calling-capable"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3562379",
+        "_score": 282.9604,
+        "_source": {
+          "name": [
+            "Apple\u00ae - iPhone\u00ae 4S with 16GB Memory Mobile Phone - Black (Verizon Wireless)"
+          ],
+          "shortDescription": [
+            "iOS 5 operating systemSiri voice assistanceiCloud content storageiSight 8.0MP camera with 1080p HD videoDual-core A5 chip  \nRequires a voice plan and a data package\n\nEarly termination fee of $350."
+          ]
+        }
+      }
+    ]
+  }
+}
+(('__label__pcmcat209400050001',), array([0.45510501]))
+
+More Iphones, less gadgets for iphones due to the right category applied.
+
+Even after extensive search I struggle to find an example where I get multiple classifications. I believe that such an example should improve the results.
+
+
+Give 2 or 3 examples of queries where filtering hurt the results, either because the classifier was wrong or for some other reason. Again, include the classifier output for those queries.
+
+video games
+{
+  "took": 50,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 10000,
+      "relation": "gte"
+    },
+    "max_score": 53.941536,
+    "hits": [
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "2634915",
+        "_score": 53.941536,
+        "_source": {
+          "name": [
+            "Rocketfish\u2122 - 9' In-Wall HDMI Cable"
+          ],
+          "shortDescription": [
+            "Connects an HDMI source to an HDTV or projector with an HDMI input; compatible with most screen refresh rates; in-wall rated"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "5215429",
+        "_score": 50.481586,
+        "_source": {
+          "name": [
+            "Samsung - Galaxy Tab 2 10.1 with 16GB Memory - Titanium Silver"
+          ],
+          "shortDescription": [
+            "Android 4.0 Ice Cream Sandwich10.1\" TFT WXGA touch screenWi-Fi16GB storage capacityGoogle Talk, YouTube, Gmail, Netflix"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "2893174",
+        "_score": 36.47192,
+        "_source": {
+          "name": [
+            "Samsung - 32\" Class - LCD -720p - 60Hz - HDTV"
+          ],
+          "shortDescription": []
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "2089307",
+        "_score": 31.941973,
+        "_source": {
+          "name": [
+            "Belkin - N600 Dual-Band Wireless-N+ Router with 4-Port Switch and USB Port"
+          ],
+          "shortDescription": [
+            "Up to 300 Mbps + 300 Mbps data transfer rates; MultiBeam technology; preset security; self-healing application; Print Zone wireless printing app"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "2976125",
+        "_score": 28.555666,
+        "_source": {
+          "name": [
+            "Dell - 24\" Widescreen LED Monitor"
+          ],
+          "shortDescription": [
+            "ENERGY STAR Qualified\n 5 ms response time; 7,000,000:1 contrast ratio; 250 cd/m\u00b2 brightness; 1920 x 1080 maximum resolution; VGA, HDMI and DVI-D inputs"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "7212606",
+        "_score": 25.077856,
+        "_source": {
+          "name": [
+            "Nintendo - Nintendo DS Gaming System"
+          ],
+          "shortDescription": [
+            "Take your gameplay on the road with an all-new portable system"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "9487986",
+        "_score": 24.20374,
+        "_source": {
+          "name": [
+            "SanDisk - Extreme 16GB CompactFlash Memory Card"
+          ],
+          "shortDescription": [
+            "Compatible with most CompactFlash-enabled devices; 16GB storage space; up to 60MB/sec. read/write speed"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "5767693",
+        "_score": 21.611195,
+        "_source": {
+          "name": [
+            "Toshiba - 17.3\" Satellite Laptop - 4GB Memory - 640GB Hard Drive - Mercury Silver"
+          ],
+          "shortDescription": [
+            "ENERGY STAR QualifiedWindows 7 Home Premium 64-bitTechnical details: AMD A6-Series processor; 17.3\" display; 4GB memory; 640GB hard driveSpecial features: Facial recognition; HDMI output"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "7640699",
+        "_score": 19.953283,
+        "_source": {
+          "name": [
+            "SanDisk - 2GB Secure Digital (SD) Memory Card"
+          ],
+          "shortDescription": [
+            "For use with Secure Digital-compatible devices; store game levels, digital music and videos; high transfer rate"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "2122324",
+        "_score": 19.686722,
+        "_source": {
+          "name": [
+            "Samsung - 40\" Class - LCD - 1080p - 120Hz - HDTV"
+          ],
+          "shortDescription": []
+        }
+      }
+    ]
+  }
+}
+(('__label__cat02015',), array([0.60908818]))
+
+The output above clearly does not show any video games. It appears that the classifer went wrong or the model does not have the right granularity (~400 cat)
+
+board games
+{
+  "took": 12,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 32,
+      "relation": "eq"
+    },
+    "max_score": 0.028509,
+    "hits": [
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "4615128",
+        "_score": 0.028509,
+        "_source": {
+          "name": [
+            "Game of Thrones - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Decide the fate of the Seven Kingdoms as you take a pivotal role in the fantasy saga"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "5260722",
+        "_score": 0.009688636,
+        "_source": {
+          "name": [
+            "Batman: Arkham City - Game of the Year Edition - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Return to Gotham's maximum security prison with this Game of the Year Edition"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "5584591",
+        "_score": 0.004029471,
+        "_source": {
+          "name": [
+            "Dead Island Game of the Year Edition - Xbox 360"
+          ],
+          "shortDescription": [
+            "A zombie outbreak hits this island paradise with even more terrifying content"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3052146",
+        "_score": 0.0028772687,
+        "_source": {
+          "name": [
+            "Family Game Night 4: The Game Show - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Enjoy your favorite games like never before"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "9058841",
+        "_score": 0.0021715504,
+        "_source": {
+          "name": [
+            "Monopoly - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Become the ruthless tycoon you were always meant to be"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3847076",
+        "_score": 0.0016101883,
+        "_source": {
+          "name": [
+            "uDraw: Pictionary: Ultimate Edition - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Watch your sketching skills come to life in full HD"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "9927337",
+        "_score": 0.00010428628,
+        "_source": {
+          "name": [
+            "Batman: Arkham Asylum Game of the Year Edition - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Can you escape Arkham with your life and sanity intact?"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "3559578",
+        "_score": 6.7242116e-05,
+        "_source": {
+          "name": [
+            "Red Dead Redemption: Game of the Year Edition - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Bring Western-style undead action to life like never before"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "5584255",
+        "_score": 4.5313805e-06,
+        "_source": {
+          "name": [
+            "London 2012: The Official Video Game of the Olympic Games - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Will you bring home the gold?"
+          ]
+        }
+      },
+      {
+        "_index": "bbuy_products",
+        "_type": "_doc",
+        "_id": "8316672",
+        "_score": 4.2855772e-06,
+        "_source": {
+          "name": [
+            "Transformers: The Game - PlayStation 3"
+          ],
+          "shortDescription": [
+            "Will you fight to save the Earth or fight to destroy it?"
+          ]
+        }
+      }
+    ]
+
+Some of the games are digital board games but overall the results might are not great. Potentially this could be improved by using query segmentation to recognize board games as a seperate token.
