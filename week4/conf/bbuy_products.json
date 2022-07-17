@@ -43,6 +43,16 @@
           }
         }
       },
+      "embedding": {
+        "type": "knn_vector",
+        "dimension": 384,
+        "method": {
+          "engine": "nmslib",
+          "name": "hnsw",
+          "space_type": "cosinesimil"
+        }
+
+      },
       "accessories": {
         "type": "text",
         "fields": {

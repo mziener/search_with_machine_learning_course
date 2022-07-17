@@ -17,6 +17,11 @@ import nltk
 import nltk
 stemmer = nltk.stem.PorterStemmer()
 
+from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -194,6 +199,21 @@ def create_query(user_query, click_prior_query, filters, sort="_score", sortDir=
             query_obj['query']['function_score']['query']['bool']['should'].append(should)
     return query_obj
 
+def create_vector_query(query, num_results=10):
+    embedded_query = model.encode([query])[0]
+    query_obj = {
+  "size": num_results,
+  "query": {
+    "knn": {
+      "embedding": {
+        "vector": embedded_query,
+        "k": num_results,
+      }
+    }
+  }
+}
+    return query_obj
+
 
 def search(client, user_query, index="bbuy_products", sort=None, sortDir="desc", args=None):
     processed_query = stemmer.stem(user_query.lower())
@@ -207,13 +227,18 @@ def search(client, user_query, index="bbuy_products", sort=None, sortDir="desc",
         cats = sorted(zip(ml_cat[0], ml_cat[1]), key=lambda x: x[1])
         shoulds = [{"term": {"categoryPathIds": cat[0][9:]}} for cat in cats if cat[1]>0.5]
     #filters=None
-    query_obj = create_query(user_query, click_prior_query=None, filters=filters, shoulds=shoulds,sort=sort, sortDir=sortDir, source=["name", "shortDescription"], args=args)
+    if args.vector:
+        query_obj = create_vector_query(user_query)
+    else: 
+        query_obj = create_query(user_query, click_prior_query=None, filters=filters, shoulds=shoulds,sort=sort, sortDir=sortDir, source=["name", "shortDescription"], args=args)
     logging.info(query_obj)
     response = client.search(query_obj, index=index)
     if response and response['hits']['hits'] and len(response['hits']['hits']) > 0:
         hits = response['hits']['hits']
         print(json.dumps(response, indent=2))
         print(ml_cat)
+
+
 
 
 if __name__ == "__main__":
@@ -233,6 +258,7 @@ if __name__ == "__main__":
     general.add_argument('--user',
                          help='The OpenSearch admin.  If this is set, the program will prompt for password too. If not set, use default of admin/admin')
     general.add_argument("--synonym", action="store_true", help="Search in synonyms")
+    general.add_argument("--vector",  action="store_true", help="Search using vectors")
     args = parser.parse_args()
     print(args)
 
